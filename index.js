@@ -1,13 +1,14 @@
 const apiKey = '6GSHPV5A7L5XM418';
-const stockSearch = document.getElementById('stockSearch');
-const searchButton = document.getElementById('searchButton');
-const stockDetails = document.getElementById('stockDetails');
-const stockTable = document.getElementById('stockTable').getElementsByTagName('tbody')[0];
-const ctx = document.getElementById('stockChart').getContext('2d');
+
+const stockInput = document.getElementById('stockInput');
+const searchBtn = document.getElementById('searchBtn');
+const stockInfo = document.getElementById('stockInfo');
+const compareTable = document.getElementById('compareTable').getElementsByTagName('tbody')[0];
+const ctx = document.getElementById('stockCanvas').getContext('2d');
 let stockChart;
 
-const stockDropdown = document.getElementById('stockDropdown');
-const loadStockButton = document.getElementById('loadStockButton');
+const stockSelect = document.getElementById('stockSelect');
+const fetchStockBtn = document.getElementById('fetchStockBtn');
 
 // Fetch stock data
 async function getStockData(stockSymbol) {
@@ -16,16 +17,11 @@ async function getStockData(stockSymbol) {
     return data['Time Series (Daily)'];
 }
 
-// Fetch top 10 trending stocks
+// Simulate trending stocks
 async function getTrendingStocks() {
-    const response = await fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=5min&apikey=${apiKey}`);
-    const data = await response.json();
-    // Mocking top 10 stocks as Alpha Vantage API does not directly provide top trending stocks.
-    // Replace this part with an actual trending stocks API endpoint.
     const trendingStocks = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'FB', 'NFLX', 'NVDA', 'BABA', 'INTC'];
     return trendingStocks;
 }
-
 
 // Display stock details
 function displayStockDetails(stockData, symbol) {
@@ -34,21 +30,21 @@ function displayStockDetails(stockData, symbol) {
     const price = latestData['4. close'];
     const volume = latestData['5. volume'];
     const change = (latestData['4. close'] - stockData[Object.keys(stockData)[1]]['4. close']).toFixed(2);
-    
-    stockDetails.innerHTML = `
+
+    stockInfo.innerHTML = `
         <h3>${symbol}</h3>
         <p>Price: $${price}</p>
         <p>Change: $${change}</p>
         <p>Volume: ${volume}</p>
     `;
 
-    updateStockTable(symbol, price, change, volume);
+    updateCompareTable(symbol, price, change, volume);
 }
 
-// Update stock comparison table
-function updateStockTable(symbol, price, change, volume) {
-    const newRow = stockTable.insertRow();
-    newRow.innerHTML = `
+// Update comparison table
+function updateCompareTable(symbol, price, change, volume) {
+    const row = compareTable.insertRow();
+    row.innerHTML = `
         <td>${symbol}</td>
         <td>$${price}</td>
         <td>${change}</td>
@@ -56,7 +52,7 @@ function updateStockTable(symbol, price, change, volume) {
     `;
 }
 
-// Display stock price graph
+// Display stock graph
 function displayStockGraph(stockData) {
     const labels = Object.keys(stockData).slice(0, 30).reverse();
     const data = labels.map(date => stockData[date]['4. close']);
@@ -80,7 +76,7 @@ function displayStockGraph(stockData) {
         options: {
             scales: {
                 x: {
-                    beginAtZero: true
+                    beginAtZero: false
                 },
                 y: {
                     beginAtZero: false
@@ -90,30 +86,32 @@ function displayStockGraph(stockData) {
     });
 }
 
-// Handle stock search
-searchButton.addEventListener('click', async () => {
-    const stockSymbol = stockSearch.value.toUpperCase();
+// Search button
+searchBtn.addEventListener('click', async () => {
+    const stockSymbol = stockInput.value.toUpperCase();
     const stockData = await getStockData(stockSymbol);
-    
     if (stockData) {
         displayStockDetails(stockData, stockSymbol);
         displayStockGraph(stockData);
     } else {
-        stockDetails.innerHTML = `<p>Stock symbol not found.</p>`;
+        stockInfo.innerHTML = `<p>Stock symbol not found.</p>`;
     }
 });
 
 // Load stock from dropdown
-loadStockButton.addEventListener('click', async () => {
-    const selectedStock = stockDropdown.value;
+fetchStockBtn.addEventListener('click', async () => {
+    const selectedStock = stockSelect.value;
     const stockData = await getStockData(selectedStock);
     if (stockData) {
         displayStockDetails(stockData, selectedStock);
         displayStockGraph(stockData);
     } else {
-        stockDetails.innerHTML = `<p>Stock data not available for ${selectedStock}.</p>`;
+        stockInfo.innerHTML = `<p>Stock data not available for ${selectedStock}.</p>`;
     }
 });
 
-
-
+// Populate dropdown on load
+window.addEventListener('DOMContentLoaded', async () => {
+    const trendingStocks = await getTrendingStocks();
+    stockSelect.innerHTML = trendingStocks.map(stock => `<option value="${stock}">${stock}</option>`).join('');
+});

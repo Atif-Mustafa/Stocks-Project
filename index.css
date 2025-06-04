@@ -19,7 +19,7 @@ main {
     padding: 20px;
 }
 
-.search-section {
+.stock-search-container {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
@@ -38,11 +38,13 @@ button {
     cursor: pointer;
 }
 
-.stock-info, .graph-section, .stock-table {
+.stock-details-container,
+.stock-graph-container,
+.stock-table-container {
     margin: 20px 0;
 }
 
-#stockChart {
+#stockCanvas {
     width: 100%;
     height: 400px;
 }
@@ -57,52 +59,31 @@ th, td {
     border: 1px solid #ddd;
     text-align: center;
 }
-.tabs-section {
-    margin-bottom: 20px;
-}
 
-.stock-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.stock-tab {
-    padding: 10px 15px;
-    margin: 5px;
-    background-color: #4CAF50;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.stock-tab:hover {
-    background-color: #45a049;
-}
-
-.stock-tab.active {
-    background-color: #3e8e41;
-}
-.dropdown-section {
+.stock-dropdown-container {
     margin-bottom: 20px;
     text-align: center;
 }
 
-#stockDropdown {
+#stockSelect {
     padding: 10px;
     font-size: 16px;
     width: 300px;
 }
 
 button {
-    padding: 10px;
-    font-size: 16px;
     margin-left: 10px;
 }
 
-
 @media (max-width: 768px) {
-    .search-section {
+    .stock-search-container {
         flex-direction: column;
+        align-items: center;
+    }
+
+    .stock-search-container input,
+    .stock-search-container button {
+        margin: 5px 0;
+        width: 90%;
     }
 }
